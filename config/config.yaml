@@ -1,0 +1,9 @@
+log:
+  level: "info"      # Level log: debug, info, warn, error
+  files:  # Lokasi penyimpanan log
+      info : "logs/info.log"
+      error : "logs/error.log"
+  max_size: 10       # Maksimal ukuran file log (MB)
+  max_backups: 5     # Jumlah maksimum backup file log
+  max_age: 30        # Lama penyimpanan file log (hari)
+  compress: true     # Kompres file log lama (gzip)

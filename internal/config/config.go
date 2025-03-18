@@ -1,14 +1,24 @@
 package config
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
 
 type LoggerFiles struct {
 	Info  string
 	Error string
+}
+
+type DatabaseConfig struct {
+	Driver      string
+	Host        string
+	Port        string
+	User        string
+	Password    string
+	Name        string
+	MaxOpenCons int
+	MaxIdleCons int
+	MaxLifeTime int
 }
 
 type LoggerConfig struct {
@@ -21,26 +31,27 @@ type LoggerConfig struct {
 }
 
 type AppConfig struct {
-	Log LoggerConfig
+	Log      LoggerConfig
+	Database DatabaseConfig
 }
 
 var Config AppConfig
 
-func LoadConfig(path string) (config AppConfig, err error) {
+func LoadConfig(path string) error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path)
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("error read configurasi file %v", err)
+		return err
 	}
 
-	err = viper.Unmarshal(&Config)
+	err := viper.Unmarshal(&Config)
 
 	if err != nil {
-		log.Fatalf("error mengurai configurasi %v", err)
+		return err
 	}
 
-	return
+	return nil
 }

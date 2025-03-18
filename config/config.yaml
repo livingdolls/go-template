@@ -7,3 +7,14 @@ log:
   max_backups: 5     # Jumlah maksimum backup file log
   max_age: 30        # Lama penyimpanan file log (hari)
   compress: true     # Kompres file log lama (gzip)
+
+database:
+  driver: "mysql"
+  host: "127.0.0.1"
+  port: "3306"
+  user: "root"
+  password: "root"
+  name: "mydb"
+  max_open_cons: 10
+  max_idle_cons: 5
+  max_life_time : 5 #time * minutes

@@ -30,9 +30,14 @@ type LoggerConfig struct {
 	Compress   bool
 }
 
+type ServerConfig struct {
+	Port int
+}
+
 type AppConfig struct {
 	Log      LoggerConfig
 	Database DatabaseConfig
+	Server   ServerConfig
 }
 
 var Config AppConfig

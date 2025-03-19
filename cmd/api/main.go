@@ -8,44 +8,23 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/livingdolls/go-template/internal/config"
-	"github.com/livingdolls/go-template/internal/core/port"
+	server "github.com/livingdolls/go-template/internal/adapter/http"
+	"github.com/livingdolls/go-template/internal/bootstrap"
 	"github.com/livingdolls/go-template/internal/infrastructure/logger"
-	"github.com/livingdolls/go-template/internal/infrastructure/storages"
 	"go.uber.org/zap"
 )
 
 func main() {
 	// Inisialisasi aplikasi
-	db := initialize()
+	db := bootstrap.Setup()
 	defer db.Close()
 	defer logger.SyncLogger()
 
 	// Mulai server
-	server := StartServer(db)
+	server := server.StartServer(db)
 
 	// Menunggu sinyal shutdown
 	waitForShutdown(server)
-}
-
-// initialize melakukan setup awal aplikasi
-func initialize() port.DatabasePort {
-	// Load configuration
-	if err := config.LoadConfig("config"); err != nil {
-		zap.L().Fatal("Failed to load configuration file", zap.Error(err))
-	}
-
-	// Initialize logger
-	logger.InitLogger(config.Config)
-
-	// Initialize database
-	db, err := storages.NewDatabase(config.Config.Database)
-	if err != nil {
-		logger.Log.Fatal("Failed to connect to database", zap.Error(err))
-	}
-
-	logger.Log.Info("Application successfully initialized")
-	return db
 }
 
 // waitForShutdown menangani shutdown aplikasi dengan gracefull

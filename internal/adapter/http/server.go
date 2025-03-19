@@ -1,4 +1,4 @@
-package main
+package http
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	server "github.com/livingdolls/go-template/internal/adapter/http"
 	"github.com/livingdolls/go-template/internal/config"
 	"github.com/livingdolls/go-template/internal/core/port"
 	"github.com/livingdolls/go-template/internal/infrastructure/logger"
@@ -14,7 +13,7 @@ import (
 )
 
 func StartServer(db port.DatabasePort) *http.Server {
-	router := server.NewRouter(db)
+	router := NewRouter(db)
 
 	serverHost := fmt.Sprintf(":%v", config.Config.Server.Port)
 

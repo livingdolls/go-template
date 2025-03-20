@@ -3,11 +3,13 @@ package model
 import "time"
 
 type User struct {
-	ID        string
-	Name      string
-	Email     string
-	Password  string
-	Provider  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Email        string    `json:"email"`
+	PasswordHash string    `json:"password_hash"`
+	Provider     string    `json:"provider"`
+	ProviderID   *string   `json:"provider_id"`
+	IsVerified   bool      `json:"is_verified"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }

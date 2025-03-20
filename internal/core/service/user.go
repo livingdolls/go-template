@@ -1,8 +1,6 @@
 package service
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	"github.com/livingdolls/go-template/internal/core/dto"
 	"github.com/livingdolls/go-template/internal/core/entity"
@@ -28,7 +26,7 @@ func (u *userService) Register(req dto.RegisterUserRequest) (*model.User, error)
 	}
 
 	if isUserExit != nil {
-		return nil, errors.New("email sudah digunakan")
+		return nil, entity.ErrConflictingData
 	}
 
 	hashedPassword, err := hash.HashString(req.Password)

@@ -1,33 +1,45 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
-    build: .
-    container_name: go-template
+    container_name: go_app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     depends_on:
       - db
+    networks:
+      - my_network
     environment:
       - DB_HOST=db
+      - DB_PORT=3306
       - DB_USER=yurina
       - DB_PASSWORD=hirate
-      - DB_NAME=gotemplate
-      - DB_PORT=3306
+      - DB_NAME=go_app
     volumes:
       - .:/app
+    command: ["/app/wait-for.sh", "db:3306", "--", "/app/start.sh"]
 
   db:
-    image: mysql:latest
     container_name: mysql_db
+    image: mysql:latest
     restart: always
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD: hirate
-      - MYSQL_DATABASE: gotemplate
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: go_app
+      MYSQL_USER: yurina
+      MYSQL_PASSWORD: hirate
+    networks:
+      - my_network
     volumes:
-      - mysql_data :/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+
+networks:
+  my_network:
 
 volumes:
   mysql_data:

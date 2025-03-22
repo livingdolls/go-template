@@ -13,7 +13,7 @@ import (
 )
 
 func StartServer(db port.DatabasePort) *http.Server {
-	router := NewRouter(db)
+	router := SetupRouter(db)
 
 	serverHost := fmt.Sprintf(":%v", config.Config.Server.Port)
 

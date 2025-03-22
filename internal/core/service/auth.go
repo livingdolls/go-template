@@ -9,16 +9,16 @@ import (
 	"github.com/livingdolls/go-template/pkg/hash"
 )
 
-type userService struct {
+type authService struct {
 	userRepo port.UserRepository
 }
 
-func NewUserService(userRepo port.UserRepository) port.UserService {
-	return &userService{userRepo: userRepo}
+func NewAuthService(userRepo port.UserRepository) port.AuthService {
+	return &authService{userRepo: userRepo}
 }
 
 // Register implements port.UserService.
-func (u *userService) Register(req dto.RegisterUserRequest) (*model.User, error) {
+func (u *authService) Register(req dto.RegisterUserRequest) (*model.User, error) {
 	isUserExit, err := u.userRepo.GetUserByEmail(req.Email)
 
 	if err != nil {

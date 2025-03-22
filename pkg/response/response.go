@@ -1,4 +1,4 @@
-package dto
+package response
 
 import (
 	"errors"
@@ -38,9 +38,9 @@ type ErrorResponse struct {
 
 // SuccessResponse represents the success response structure.
 type SuccessResponse struct {
-	Success bool        `json:"success" example:"true"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success" example:"true"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // NewErrorResponse creates a structured error response.
@@ -81,7 +81,7 @@ func HandleValidationError(c *gin.Context, err error) {
 }
 
 // HandleSuccessResponse sends a success response with data.
-func HandleSuccessResponse(c *gin.Context, code int, message string, data interface{}) {
+func HandleSuccessResponse(c *gin.Context, code int, message string, data any) {
 	resp := NewSuccessResponse(message, data)
 	c.JSON(code, resp)
 }

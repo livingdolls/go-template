@@ -5,10 +5,20 @@ import (
 	"github.com/livingdolls/go-template/internal/core/port"
 )
 
-func NewRouter(db port.DatabasePort) *gin.Engine {
-	router := gin.Default()
+func SetupRouter(db port.DatabasePort) *gin.Engine {
+	r := gin.Default()
 
-	router.Use(gin.Recovery())
+	deps := NewAppContainer(db)
 
-	return router
+	apiV1 := r.Group("/api/v1")
+	initV1Routes(apiV1, deps)
+
+	return r
+}
+
+func initV1Routes(r *gin.RouterGroup, debs *AppContainer) {
+	authRoutes := r.Group("/auth")
+	{
+		authRoutes.POST("register", debs.AuthContainer.AuthHanlder.Register)
+	}
 }

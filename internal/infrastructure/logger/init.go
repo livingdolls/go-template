@@ -47,13 +47,22 @@ func InitLogger(config config.AppConfig) {
 		Compress:   config.Log.Compress,
 	})
 
+	// Logger untuk file APP (semua log)
+	appWriter := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "app.log", // Nama file untuk semua log
+		MaxSize:    config.Log.MaxSize,
+		MaxBackups: config.Log.MaxBackups,
+		MaxAge:     config.Log.MaxAge,
+		Compress:   config.Log.Compress,
+	})
+
 	// Encoder JSON
 	jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
 
 	// Console Encoder
 	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
 
-	// Buat core untuk masing-masing level
+	// Core untuk masing-masing log
 	infoCore := zapcore.NewCore(jsonEncoder, infoWriter, zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.InfoLevel && lvl < zapcore.ErrorLevel
 	}))
@@ -62,10 +71,14 @@ func InitLogger(config config.AppConfig) {
 		return lvl >= zapcore.ErrorLevel
 	}))
 
+	appCore := zapcore.NewCore(jsonEncoder, appWriter, zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return true // Menyimpan semua level log
+	}))
+
 	consoleCore := zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), logLevel)
 
 	// Gabungkan semua core
-	core := zapcore.NewTee(infoCore, errorCore, consoleCore)
+	core := zapcore.NewTee(infoCore, errorCore, appCore, consoleCore)
 
 	// Inisialisasi logger
 	Log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))

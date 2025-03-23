@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/livingdolls/go-template/internal/config"
@@ -14,12 +15,14 @@ func Setup() port.DatabasePort {
 	configPath, err := filepath.Abs("config")
 
 	if err != nil {
-		zap.L().Fatal("Gagal mendapatkan path absolute", zap.Error(err))
+		println("Gagal mendapatkan path absolute:", err.Error()) // Gunakan `println` sementara
+		os.Exit(1)
 	}
 
 	// Load configuration
 	if err := config.LoadConfig(configPath); err != nil {
-		zap.L().Fatal("Failed to load configuration file", zap.Error(err))
+		println("Failed to load configuration file:", err.Error()) // Gunakan `println` sementara
+		os.Exit(1)
 	}
 
 	// Initialize logger

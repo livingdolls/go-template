@@ -26,10 +26,15 @@ COPY --from=builder /app/bin/main /app/bin/main
 
 # Copy file konfigurasi
 COPY config/config.yaml /app/config/config.yaml
-COPY start.sh /app
+
+#Copy scrip untuk menjalankan aplikasi
+COPY start.sh /app/start.sh
+COPY wait-for.sh /app/wait-for.sh
+
 # Pastikan file bisa dieksekusi
 RUN chmod +x /app/bin/main
-RUN chmod +x /app/start.sh
+RUN chmod +x /app/start.sh /app/wait-for.sh
+
 # Expose port aplikasi
 EXPOSE 8080
 

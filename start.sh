@@ -1,10 +1,21 @@
 #!/bin/sh
 
-# Dapatkan direktori tempat skrip ini berada
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+set -e  # Berhenti jika ada error
 
-# Set path konfigurasi relatif terhadap root proyek
-CONFIG_PATH="$SCRIPT_DIR/config/config.yaml"
+echo "🚀 Starting Go application..."
 
-# Jalankan aplikasi dengan path konfigurasi
-"$SCRIPT_DIR/bin/main"
+# Load environment variables
+if [ -f .env ]; then
+    echo "📦 Loading environment variables..."
+    set -o allexport
+    source .env
+    set +o allexport
+fi
+
+# Jalankan migrasi database sebelum memulai aplikasi
+echo "🔄 Running database migrations..."
+make migrate
+
+# Jalankan aplikasi
+echo "✅ Application is running!"
+./app/bin/main

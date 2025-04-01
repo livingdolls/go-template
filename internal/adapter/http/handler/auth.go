@@ -34,10 +34,9 @@ func (a *AuthHandler) Register(c *gin.Context) {
 
 	userResponse := &dto.RegisterUserResponse{
 		Id:         user.ID,
+		Name:       user.Name,
 		Email:      user.Email,
 		IsVerified: user.IsVerified,
-		CreatedAt:  user.CreatedAt,
-		UpdatedAt:  user.UpdatedAt,
 	}
 
 	response.HandleSuccessResponse(c, http.StatusCreated, "Register successfully", userResponse)

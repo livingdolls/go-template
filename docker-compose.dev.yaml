@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 
 services:
   app:
@@ -10,26 +10,35 @@ services:
       - /app/bin  # Ignore bin supaya tidak overwrite di container
     ports:
       - "8080:8080"
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=secret
-      - DB_NAME=myapp
+    networks:
+      - dev_network
     depends_on:
       - db
-    command: ["air"]  # Jalankan aplikasi dengan hot-reload
+    command: ["air"]
 
   db:
     image: mysql:8.1
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: myapp
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: go_app_dev
+      MYSQL_USER: yurina
+      MYSQL_PASSWORD: hirate
+      MYSQL_ROOT_HOST: '%'
     ports:
       - "3306:3306"
+    networks:
+      - dev_network
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      timeout: 20s
+      retries: 10
 
 volumes:
   db_data:
+
+networks:
+  dev_network:
+    driver: bridge

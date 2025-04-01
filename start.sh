@@ -4,18 +4,17 @@ set -e  # Berhenti jika ada error
 
 echo "🚀 Starting Go application..."
 
-# Load environment variables
-if [ -f .env ]; then
-    echo "📦 Loading environment variables..."
-    set -o allexport
-    source .env
-    set +o allexport
+# Run migrations automatically (only 'up' in production)
+if [ -f ./migrate ]; then
+  echo "Running database migrations..."
+  ./migrate up
+  if [ $? -ne 0 ]; then
+    echo "Migration failed!"
+    exit 1
+  fi
 fi
 
-# Jalankan migrasi database sebelum memulai aplikasi
-echo "🔄 Running database migrations..."
-make migrate
 
 # Jalankan aplikasi
 echo "✅ Application is running!"
-./app/bin/main
+exec ./main 

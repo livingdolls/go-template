@@ -10,11 +10,11 @@ log:
 
 database:
   driver: "mysql"
-  host: "127.0.0.1"
+  host: "db"
   port: "3306"
-  user: "root"
-  password: "root"
-  name: "mydb"
+  user: "yurina"
+  password: "hirate"
+  name: "go_app"
   max_open_cons: 10
   max_idle_cons: 5
   max_life_time : 5 #time * minutes

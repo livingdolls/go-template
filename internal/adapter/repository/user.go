@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 
 	"github.com/livingdolls/go-template/internal/core/model"
 	"github.com/livingdolls/go-template/internal/core/port"
@@ -16,12 +19,62 @@ func NewUserRepository(db port.DatabasePort) port.UserRepository {
 }
 
 // CreateUser implements port.UserRepository.
-func (u *userRepository) CreateUser(user *model.User) error {
-	query := `INSERT INTO users (id, name, email, password_hash, provider, is_verified, created_at, updated_at)
-	VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`
+func (u *userRepository) CreateUser(ctx context.Context, user *model.User) error {
+	// Mulai transaction
+	tx, err := u.db.GetDatabase().BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
 
-	_, err := u.db.GetDatabase().Exec(query, user.ID, user.Name, user.Email, user.PasswordHash, user.Provider, user.IsVerified)
-	return err
+	// Gunakan defer dengan pengecekan error
+	var txErr error
+	defer func() {
+		if txErr != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				txErr = fmt.Errorf("rollback error: %v (original error: %w)", rbErr, txErr)
+			}
+		}
+	}()
+
+	// 1. Insert user
+	userQuery := `INSERT INTO users (id, name, email, password_hash, provider, is_verified, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`
+
+	if _, err = tx.ExecContext(ctx, userQuery,
+		user.ID, user.Name, user.Email, user.PasswordHash, user.Provider, user.IsVerified); err != nil {
+
+		txErr = fmt.Errorf("failed to insert user: %w", err)
+		return txErr
+	}
+
+	// 2. Assign default role
+	roleQuery := `INSERT INTO user_roles (user_id, role_id)
+                 SELECT ?, id FROM roles WHERE name = 'user'`
+
+	res, err := tx.ExecContext(ctx, roleQuery, user.ID)
+	if err != nil {
+		txErr = fmt.Errorf("failed to assign user role: %w", err)
+		return txErr
+	}
+
+	// Verifikasi role benar-benar terassign
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		txErr = fmt.Errorf("failed to check role assignment: %w", err)
+		return txErr
+	}
+	if rowsAffected == 0 {
+		txErr = errors.New("default 'user' role not found in database")
+		return txErr
+	}
+
+	// Commit transaction jika semua sukses
+	if err := tx.Commit(); err != nil {
+		txErr = fmt.Errorf("failed to commit transaction: %w", err)
+		return txErr
+	}
+
+	return nil
 }
 
 // GetUserByEmail implements port.UserRepository.

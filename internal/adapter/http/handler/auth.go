@@ -25,7 +25,7 @@ func (a *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := a.userService.Register(req)
+	user, err := a.userService.Register(&gin.Context{}, req)
 
 	if err != nil {
 		response.HandleErrorResponse(c, err)

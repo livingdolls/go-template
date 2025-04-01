@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/livingdolls/go-template/internal/core/dto"
 	"github.com/livingdolls/go-template/internal/core/entity"
@@ -18,7 +20,7 @@ func NewAuthService(userRepo port.UserRepository) port.AuthService {
 }
 
 // Register implements port.UserService.
-func (u *authService) Register(req dto.RegisterUserRequest) (*model.User, error) {
+func (u *authService) Register(ctx context.Context, req dto.RegisterUserRequest) (*model.User, error) {
 	isUserExit, err := u.userRepo.GetUserByEmail(req.Email)
 
 	if err != nil {
@@ -44,7 +46,7 @@ func (u *authService) Register(req dto.RegisterUserRequest) (*model.User, error)
 		IsVerified:   false,
 	}
 
-	err = u.userRepo.CreateUser(user)
+	err = u.userRepo.CreateUser(ctx, user)
 
 	if err != nil {
 		return nil, entity.ErrInternal

@@ -5,8 +5,9 @@ import (
 )
 
 type LoggerFiles struct {
-	Info  string
-	Error string
+	Info   string
+	Error  string
+	Global string
 }
 
 type DatabaseConfig struct {

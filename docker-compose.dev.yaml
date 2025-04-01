@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev  # Pakai Dockerfile khusus dev
+    volumes:
+      - .:/app  # Sinkronisasi kode host <-> container
+      - /app/bin  # Ignore bin supaya tidak overwrite di container
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=myapp
+    depends_on:
+      - db
+    command: ["air"]  # Jalankan aplikasi dengan hot-reload
+
+  db:
+    image: mysql:8.1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: myapp
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

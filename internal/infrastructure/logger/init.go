@@ -49,7 +49,7 @@ func InitLogger(config config.AppConfig) {
 
 	// Logger untuk file APP (semua log)
 	appWriter := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "app.log", // Nama file untuk semua log
+		Filename:   config.Log.Files.Global, // Nama file untuk semua log
 		MaxSize:    config.Log.MaxSize,
 		MaxBackups: config.Log.MaxBackups,
 		MaxAge:     config.Log.MaxAge,

@@ -29,7 +29,7 @@ func (u *authService) Register(ctx context.Context, req dto.RegisterUserRequest)
 	}
 
 	if isUserExit != nil {
-		return nil, entity.ErrConflictingData
+		return nil, entity.ErrEmailAlreadyExits
 	}
 
 	hashedPassword, err := hash.HashString(req.Password)

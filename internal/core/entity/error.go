@@ -22,6 +22,7 @@ var (
 	ErrInvalidAuthorizationType   = errors.New("authorization type is not supported")
 	ErrUnauthorized               = errors.New("user is unauthorized to access this resource")
 	ErrForbidden                  = errors.New("user is forbidden from accessing this resource")
+	ErrEmailAlreadyExits          = errors.New("email address is exits")
 )
 
 // Session & Security Errors

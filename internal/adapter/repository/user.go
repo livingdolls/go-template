@@ -8,6 +8,8 @@ import (
 
 	"github.com/livingdolls/go-template/internal/core/model"
 	"github.com/livingdolls/go-template/internal/core/port"
+	"github.com/livingdolls/go-template/internal/infrastructure/logger"
+	"go.uber.org/zap"
 )
 
 type userRepository struct {
@@ -32,6 +34,7 @@ func (u *userRepository) CreateUser(ctx context.Context, user *model.User) error
 		if txErr != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
 				txErr = fmt.Errorf("rollback error: %v (original error: %w)", rbErr, txErr)
+				logger.Log.Error("rollback error", zap.Error(rbErr), zap.Error(txErr))
 			}
 		}
 	}()

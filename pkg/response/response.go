@@ -43,6 +43,12 @@ type SuccessResponse struct {
 	Data    any    `json:"data,omitempty"`
 }
 
+type Response struct {
+	Success bool   `json:"success" example:"true"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
+}
+
 // NewErrorResponse creates a structured error response.
 func NewErrorResponse(code int, errMsgs []string) ErrorResponse {
 	return ErrorResponse{
@@ -56,6 +62,14 @@ func NewErrorResponse(code int, errMsgs []string) ErrorResponse {
 func NewSuccessResponse(message string, data any) SuccessResponse {
 	return SuccessResponse{
 		Success: true,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func NewResponse(success bool, message string, data any) Response {
+	return Response{
+		Success: success,
 		Message: message,
 		Data:    data,
 	}
@@ -83,6 +97,11 @@ func HandleValidationError(c *gin.Context, err error) {
 // HandleSuccessResponse sends a success response with data.
 func HandleSuccessResponse(c *gin.Context, code int, message string, data any) {
 	resp := NewSuccessResponse(message, data)
+	c.JSON(code, resp)
+}
+
+func HanldeResponse(c *gin.Context, code int, success bool, message string, data any) {
+	resp := NewResponse(success, message, data)
 	c.JSON(code, resp)
 }
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/livingdolls/go-template/internal/core/dto"
@@ -46,11 +47,23 @@ func (u *authService) Register(ctx context.Context, req dto.RegisterUserRequest)
 		IsVerified:   false,
 	}
 
-	err = u.userRepo.CreateUser(ctx, user)
-
-	if err != nil {
-		return nil, entity.ErrInternal
+	if err := u.userRepo.CreateUser(ctx, user); err != nil {
+		return nil, err
 	}
+
+	// Create token verification
+	token := uuid.New().String()
+	verificationToken := &model.VerificationToken{
+		Token:     token,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+	}
+
+	if err := u.userRepo.CreateVerificationToken(ctx, verificationToken); err != nil {
+		return nil, err
+	}
+
+	// TODO:: Create mail service to send verification
 
 	return user, nil
 }

@@ -96,3 +96,15 @@ func (u *userRepository) GetUserByEmail(email string) (*model.User, error) {
 
 	return &user, nil
 }
+
+// CreateVerificationToken implements port.UserRepository.
+func (u *userRepository) CreateVerificationToken(ctx context.Context, token *model.VerificationToken) error {
+	_, err := u.db.GetDatabase().ExecContext(ctx, `
+        INSERT INTO verification_tokens 
+        (token, user_id, token_type, expires_at)
+        VALUES (?, ?, 'email_verification', ?)`,
+		token.Token, token.UserID, token.ExpiresAt,
+	)
+
+	return err
+}

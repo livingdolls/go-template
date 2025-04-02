@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	ID           string    `json:"id"`
@@ -20,4 +22,10 @@ type Role struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
+}
+
+type VerificationToken struct {
+	Token     string    `json:"token"`
+	UserID    string    `json:"user_id"`
+	ExpiresAt time.Time `json:"expires_at"`
 }

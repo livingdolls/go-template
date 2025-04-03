@@ -27,6 +27,7 @@ var ErrorStatusMap = map[error]int{
 	entity.ErrSessionBlocked:             http.StatusUnauthorized,
 	entity.ErrMissmatchSession:           http.StatusUnauthorized,
 	entity.ErrCaptchaInvalid:             http.StatusBadRequest,
+	entity.ErrEmailAlreadyExits:          http.StatusConflict,
 }
 
 // ErrorResponse represents the error response structure.

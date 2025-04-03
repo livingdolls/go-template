@@ -37,3 +37,38 @@ func Setup() port.DatabasePort {
 	logger.Log.Info("Application successfully initialized")
 	return db
 }
+
+// func setupMessageBroker() (port.MessagePublisher, port.MessageConsumer, error) {
+// 	if err := loadConfig(); err != nil {
+// 		return nil, nil, err
+// 	}
+
+// 	// Initialize RabbitMQ
+// 	rabbitMQUrl := fmt.Sprintf("amqp://%v:%v@%v:%v/",
+// 		config.Config.RabbitMQ.User,
+// 		config.Config.RabbitMQ.Password,
+// 		config.Config.RabbitMQ.Host,
+// 		config.Config.RabbitMQ.Port,
+// 	)
+
+// 	registry := messagebroker.NewHandlerRegistry()
+
+// 	adapter, err := messagebroker.NewRabbitMQAdapter(rabbitMQUrl, registry)
+// }
+
+// func loadConfig() error {
+// 	configPath, err := filepath.Abs("config")
+
+// 	if err != nil {
+// 		println("Gagal mendapatkan path absolute:", err.Error()) // Gunakan `println` sementara
+// 		os.Exit(1)
+// 	}
+
+// 	if err := config.LoadConfig(configPath); err != nil {
+// 		println("Failed to load configuration file:", err.Error()) // Gunakan `println` sementara
+// 		os.Exit(1)
+// 	}
+
+// 	logger.InitLogger(config.Config)
+// 	return nil
+// }

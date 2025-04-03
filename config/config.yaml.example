@@ -20,5 +20,18 @@ database:
   max_idle_cons: 5
   max_life_time : 5 #time * minutes
 
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  username: ""
+  password: ""
+  from: "Yurina Hirate"
+
+rabbitmq:
+  user: "guest"
+  password: "guest"
+  host: "rabbimq"
+  port: "5672"
+
 server:
   port: 8080

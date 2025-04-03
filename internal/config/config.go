@@ -22,6 +22,21 @@ type DatabaseConfig struct {
 	MaxLifeTime int
 }
 
+type RabbitMQConfig struct {
+	User     string
+	Password string
+	Host     string
+	Port     string
+}
+
+type SMTPConfig struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+	From     string
+}
+
 type LoggerConfig struct {
 	Level      string
 	Files      LoggerFiles
@@ -38,6 +53,8 @@ type ServerConfig struct {
 type AppConfig struct {
 	Log      LoggerConfig
 	Database DatabaseConfig
+	RabbitMQ RabbitMQConfig
+	SMTP     SMTPConfig
 	Server   ServerConfig
 }
 

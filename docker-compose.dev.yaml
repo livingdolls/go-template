@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.dev  # Pakai Dockerfile khusus dev
+      dockerfile: Dockerfile.dev
     volumes:
       - .:/app  # Sinkronisasi kode host <-> container
       - /app/bin  # Ignore bin supaya tidak overwrite di container
@@ -36,8 +36,29 @@ services:
       timeout: 20s
       retries: 10
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672" #AMQP Protocol
+      - "15672:15672" #Rabbitmq Dashboard Manajemen UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - dev_network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   db_data:
+  rabbitmq_data:
 
 networks:
   dev_network:

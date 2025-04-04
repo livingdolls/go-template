@@ -137,7 +137,8 @@ func (r *RabbitMQAdapter) Consume(ctx context.Context, queue, exchange, routingK
 		return err
 	}
 
-	logger.Log.Info("queue receuver", zap.String("queue name", queue))
+	logger.Log.Info("queue receiver", zap.String("queue name", queue))
+	logger.Log.Info("routing key", zap.String(" : ", routingKey))
 
 	// Proses pesan
 	go func() {
@@ -152,7 +153,7 @@ func (r *RabbitMQAdapter) Consume(ctx context.Context, queue, exchange, routingK
 					continue
 				}
 
-				logger.Log.Info("queue receuver", zap.String("events", eventType))
+				logger.Log.Info("queue receiver", zap.String("events", eventType))
 
 				handler, exists := r.registry.GetHandler(eventType)
 

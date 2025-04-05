@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/livingdolls/go-template/internal/infrastructure/logger"
+	"go.uber.org/zap"
 	"gopkg.in/mail.v2"
 )
 
@@ -38,7 +40,10 @@ func (s *MailSender) Send(ctx context.Context, to, subject, body string) error {
 	d.StartTLSPolicy = mail.MandatoryStartTLS
 
 	if err := d.DialAndSend(m); err != nil {
+		logger.Log.Error("failed to send mail", zap.Error(err))
 		return fmt.Errorf("failed to send email: %w", err)
 	}
+
+	logger.Log.Info("successfully to send mail, detail :", zap.String("to :", to), zap.String("subject", subject))
 	return nil
 }

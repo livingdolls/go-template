@@ -9,11 +9,14 @@ import (
 	"github.com/livingdolls/go-template/internal/config"
 	"github.com/livingdolls/go-template/internal/core/port"
 	"github.com/livingdolls/go-template/internal/infrastructure/logger"
+	"github.com/livingdolls/go-template/internal/infrastructure/messagebroker"
 	"go.uber.org/zap"
 )
 
-func StartServer(db port.DatabasePort) *http.Server {
-	router := SetupRouter(db)
+func StartServer(db port.DatabasePort, rmq *messagebroker.RabbitMQAdapter) *http.Server {
+	rmqPublisher := messagebroker.NewRabbitMQPublisher(rmq)
+
+	router := SetupRouter(db, rmqPublisher)
 
 	serverHost := fmt.Sprintf(":%v", config.Config.Server.Port)
 

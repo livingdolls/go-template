@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,15 +10,20 @@ import (
 	"github.com/livingdolls/go-template/internal/core/entity"
 	"github.com/livingdolls/go-template/internal/core/model"
 	"github.com/livingdolls/go-template/internal/core/port"
+	"github.com/livingdolls/go-template/pkg/events"
 	"github.com/livingdolls/go-template/pkg/hash"
 )
 
 type authService struct {
-	userRepo port.UserRepository
+	userRepo  port.UserRepository
+	publisher port.EventPublisher
 }
 
-func NewAuthService(userRepo port.UserRepository) port.AuthService {
-	return &authService{userRepo: userRepo}
+func NewAuthService(userRepo port.UserRepository, publisher port.EventPublisher) port.AuthService {
+	return &authService{
+		userRepo:  userRepo,
+		publisher: publisher,
+	}
 }
 
 // Register implements port.UserService.
@@ -64,6 +70,19 @@ func (u *authService) Register(ctx context.Context, req dto.RegisterUserRequest)
 	}
 
 	// TODO:: Create mail service to send verification
+
+	payload, err := json.Marshal(map[string]string{
+		"email": "yurinahirate@gmail.com",
+		"token": "token",
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.publisher.Publish(events.EmailVerificationEvent, payload); err != nil {
+		return nil, err
+	}
 
 	return user, nil
 }

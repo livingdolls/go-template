@@ -8,19 +8,21 @@ import (
 )
 
 type AuthContainer struct {
-	UserRepo    port.UserRepository
-	AuthService port.AuthService
-	AuthHanlder handler.AuthHandler
+	UserRepo       port.UserRepository
+	AuthService    port.AuthService
+	AuthHanlder    handler.AuthHandler
+	EventPublisher port.EventPublisher
 }
 
-func NewAuthContainer(db port.DatabasePort) *AuthContainer {
+func NewAuthContainer(db port.DatabasePort, publisher port.EventPublisher) *AuthContainer {
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo)
+	authService := service.NewAuthService(userRepo, publisher)
 	authHandler := handler.NewAuthHandler(authService)
 
 	return &AuthContainer{
-		UserRepo:    userRepo,
-		AuthService: authService,
-		AuthHanlder: *authHandler,
+		UserRepo:       userRepo,
+		AuthService:    authService,
+		AuthHanlder:    *authHandler,
+		EventPublisher: publisher,
 	}
 }

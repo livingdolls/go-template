@@ -3,8 +3,8 @@ package email
 import (
 	"context"
 
-	"github.com/livingdolls/go-template/internal/core/events"
 	"github.com/livingdolls/go-template/internal/core/port"
+	"github.com/livingdolls/go-template/pkg/events"
 )
 
 type EmailService struct {

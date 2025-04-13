@@ -9,8 +9,8 @@ type AppContainer struct {
 	AuthContainer *container.AuthContainer
 }
 
-func NewAppContainer(db port.DatabasePort) *AppContainer {
+func NewAppContainer(db port.DatabasePort, publisher port.EventPublisher) *AppContainer {
 	return &AppContainer{
-		AuthContainer: container.NewAuthContainer(db),
+		AuthContainer: container.NewAuthContainer(db, publisher),
 	}
 }

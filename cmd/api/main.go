@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,24 +10,11 @@ import (
 
 	server "github.com/livingdolls/go-template/internal/adapter/http"
 	"github.com/livingdolls/go-template/internal/bootstrap"
-	"github.com/livingdolls/go-template/internal/core/email"
-	"github.com/livingdolls/go-template/internal/core/events"
+	_ "github.com/livingdolls/go-template/internal/core/email"
 	"github.com/livingdolls/go-template/internal/infrastructure/logger"
 	"github.com/livingdolls/go-template/internal/infrastructure/messagebroker"
 	"go.uber.org/zap"
 )
-
-type NotificationHandler struct{}
-
-func NewNotificationHandler() *NotificationHandler {
-	return &NotificationHandler{}
-}
-
-func (h *NotificationHandler) Handle(ctx context.Context, msg []byte) error {
-	// Logika pengolahan pesan notification
-	fmt.Printf("Processing notification message: %s\n", msg)
-	return nil
-}
 
 func main() {
 	// Inisialisasi aplikasi
@@ -37,54 +22,20 @@ func main() {
 	defer db.Close()
 	defer logger.SyncLogger()
 
-	registry := messagebroker.NewHandlerRegistry()
-
-	registry.RegisterHandler(events.EmailVerificationEvent, email.NewEmailHandler())
-	registry.RegisterHandler(events.NotificationSendEvent, NewNotificationHandler())
-
-	rabbitMQ, err := messagebroker.NewRabbitMQAdapter("amqp://guest:guest@rabbitmq:5672/", registry)
-	if err != nil {
-		logger.Log.Fatal("Failed to connect to RabbitMQ: ", zap.Error(err))
-	}
-	defer rabbitMQ.Close()
-
-	// Jalankan Consumer untuk mendengarkan pesan dari queue
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go func() {
-		fmt.Print("jalan")
-		err := rabbitMQ.Consume(ctx, "event_queue", "events", events.EmailVerificationEvent)
-		if err != nil {
-			log.Fatalf("Failed to start consumer: %v", err)
-		}
-	}()
-
-	go func() {
-		err := rabbitMQ.Consume(ctx, "event_queue", "events", events.NotificationSendEvent) // Untuk notification
-		if err != nil {
-			log.Fatalf("Failed to start consumer: %v", err)
-		}
-	}()
-
-	// Simulasi Publish Event
-	time.Sleep(2 * time.Second) // Tunggu RabbitMQ siap
-	err = rabbitMQ.Publish(ctx, "events", events.EmailVerificationEvent, map[string]string{"ss": "1212"})
+	rmq, err := messagebroker.NewRabbitMQAdapter("amqp://guest:guest@rabbitmq:5672", messagebroker.GlobalRegistry())
 	if err != nil {
-		log.Fatalf("Failed to publish message: %v", err)
+		logger.Log.Fatal("failed to start rabbitmq", zap.Error(err))
 	}
 
-	// Simulasi Publish Event untuk notification
-	err = rabbitMQ.Publish(ctx, "events", events.NotificationSendEvent, map[string]string{"message": "This is a notificatison"})
-	if err != nil {
-		log.Fatalf("Failed to publish message: %v", err)
+	// Start RabbitMQ consumer
+	if err := messagebroker.StartRabbitMQConsumer(ctx, rmq); err != nil {
+		logger.Log.Fatal("Failed to start rabbitmq consumer", zap.Error(err))
 	}
 
-	// Tunggu agar pesan bisa diproses sebelum aplikasi berhenti
-	time.Sleep(5 * time.Second)
-
-	// Mulai server
-	server := server.StartServer(db)
+	server := server.StartServer(db, rmq)
 
 	// Menunggu sinyal shutdown
 	waitForShutdown(server)

@@ -72,6 +72,8 @@ func (r *RabbitMQAdapter) Publish(ctx context.Context, exchange, routingKey stri
 		return err
 	}
 
+	logger.Log.Info("publish payload")
+
 	return r.channel.Publish(
 		exchange,
 		routingKey,
@@ -137,9 +139,6 @@ func (r *RabbitMQAdapter) Consume(ctx context.Context, queue, exchange, routingK
 		return err
 	}
 
-	logger.Log.Info("queue receiver", zap.String("queue name", queue))
-	logger.Log.Info("routing key", zap.String(" : ", routingKey))
-
 	// Proses pesan
 	go func() {
 		for {
@@ -154,6 +153,7 @@ func (r *RabbitMQAdapter) Consume(ctx context.Context, queue, exchange, routingK
 				}
 
 				logger.Log.Info("queue receiver", zap.String("events", eventType))
+				logger.Log.Info("queue msg", zap.String("message", string(msg.Body)))
 
 				handler, exists := r.registry.GetHandler(eventType)
 
@@ -163,7 +163,8 @@ func (r *RabbitMQAdapter) Consume(ctx context.Context, queue, exchange, routingK
 				}
 
 				if err := handler.Handle(ctx, msg.Body); err != nil {
-					msg.Nack(false, true) // requeue
+					logger.Log.Error("Handler error", zap.String("event", eventType), zap.Error(err))
+					msg.Nack(false, false) // requeue
 				} else {
 					msg.Ack(false)
 				}

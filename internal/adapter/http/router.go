@@ -5,10 +5,10 @@ import (
 	"github.com/livingdolls/go-template/internal/core/port"
 )
 
-func SetupRouter(db port.DatabasePort) *gin.Engine {
+func SetupRouter(db port.DatabasePort, rmq port.EventPublisher) *gin.Engine {
 	r := gin.Default()
 
-	deps := NewAppContainer(db)
+	deps := NewAppContainer(db, rmq)
 
 	apiV1 := r.Group("/api/v1")
 	initV1Routes(apiV1, deps)

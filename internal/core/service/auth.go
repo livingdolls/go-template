@@ -10,8 +10,10 @@ import (
 	"github.com/livingdolls/go-template/internal/core/entity"
 	"github.com/livingdolls/go-template/internal/core/model"
 	"github.com/livingdolls/go-template/internal/core/port"
+	"github.com/livingdolls/go-template/internal/infrastructure/logger"
 	"github.com/livingdolls/go-template/pkg/events"
 	"github.com/livingdolls/go-template/pkg/hash"
+	"go.uber.org/zap"
 )
 
 type authService struct {
@@ -28,9 +30,11 @@ func NewAuthService(userRepo port.UserRepository, publisher port.EventPublisher)
 
 // Register implements port.UserService.
 func (u *authService) Register(ctx context.Context, req dto.RegisterUserRequest) (*model.User, error) {
+	// check is user exit
 	isUserExit, err := u.userRepo.GetUserByEmail(req.Email)
 
 	if err != nil {
+		logger.Log.Error("error register", zap.Error(err))
 		return nil, err
 	}
 

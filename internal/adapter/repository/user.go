@@ -25,6 +25,7 @@ func (u *userRepository) CreateUser(ctx context.Context, user *model.User) error
 	// Mulai transaction
 	tx, err := u.db.GetDatabase().BeginTx(ctx, nil)
 	if err != nil {
+		logger.Log.Error("failed to begin transaction", zap.Error(err))
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 

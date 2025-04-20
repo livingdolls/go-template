@@ -20,6 +20,7 @@ type database struct {
 // Close implements port.DatabasePort.
 func (d *database) Close() error {
 	if err := d.Database.Close(); err != nil {
+		logger.Log.Fatal("error closing database", zap.Error(err))
 		return fmt.Errorf("error closing database: %w", err)
 	}
 	return nil
@@ -34,7 +35,7 @@ func NewDatabase(config config.DatabaseConfig) (port.DatabasePort, error) {
 	db, err := openDatabase(config)
 
 	if err != nil {
-		logger.Log.Error("failed to connect database", zap.Error(err))
+		logger.Log.Fatal("failed to connect database", zap.Error(err))
 		return nil, fmt.Errorf("failed to connect database %v", err)
 	}
 

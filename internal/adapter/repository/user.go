@@ -95,6 +95,8 @@ func (u *userRepository) GetUserByEmail(email string) (*model.User, error) {
 			return nil, nil
 		}
 
+		logger.Log.Error("errr getUserByEmail scan user", zap.Error(err))
+
 		return nil, err
 	}
 
